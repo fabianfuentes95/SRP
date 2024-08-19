@@ -1,0 +1,422 @@
+---
+title: "World Bank’s Climate Change"
+author: "Fabian_Fuentes"
+date: "2024-08-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '/Users/fabianfuentes/Library/CloudStorage/OneDrive-InstitutoTecnologicoydeEstudiosSuperioresdeMonterrey/2024/SRP')
+```
+
+## Question 1: Comprehensive Data Acquisition and Preprocessing
+
+Después de descargar y preprocesar la información del [World Bank’s Climate Change database](https://climateknowledgeportal.worldbank.org/), se analizan las principales variables para este análisis.
+
+```{r}
+rm(list=ls())
+
+# se cargan paquetes necesarios
+if (!require(pacman)) install.packages('pacman') 
+library(pacman) ; p_load('tidyverse','data.table', 'ggplot2', 'RColorBrewer')
+
+# se carga la base de datos que se trababjó en el script de "download_data"
+df <- fread('data/wbccdb.csv')
+
+```
+## Emisiones de CO2
+
+Las emisiones de gases de efecto invernadero (GEI) causadas por el hombre impulsan el cambio climático. Alrededor del 60% de las emisiones de GEI provienen de solo 10 países , mientras que los 100 que menos emiten contribuyeron con menos del 3%. La energía representa casi las tres cuartas partes de las emisiones globales , seguida de la agricultura. Dentro del sector energético, el sector que más emite es el de generación de electricidad y calor , seguido del transporte y la industria. El uso de la tierra, el cambio de uso de la tierra y la silvicultura (LULUCF) es a la vez fuente y sumidero de emisiones y un sector clave para llegar a emisiones netas cero.
+
+
+```{r}
+# gráfico delas emisiones de  CO2 (MT)
+ggplot(df[date>=1990 & date<=2020], 
+       aes(x = date, y = EN.ATM.CO2E.KT/1e06, group = factor(country.value), 
+           color = factor(country.value))) +
+  geom_line(size = 1) +
+  labs(title = 'CO2 Emissions Over Time (GT)',
+       x = 'Year',
+       y = 'CO2 Emissions (GT)',
+       color = 'Country') +
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+
+```
+
+```{r}
+# gráfico delas emisiones de  CO2 (KT)
+ggplot(df[date>=1990 & date<=2020 & country.value!='World'], 
+       aes(x = date, y = EN.ATM.CO2E.KT/1000, group = factor(country.value), 
+           color = factor(country.value))) +
+  geom_line(size = 1) +
+  labs(title = 'CO2 Emissions Over Time (MT)',
+       x = 'Year',
+       y = 'CO2 Emissions (MT)',
+       color = 'Country') +
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+
+```
+
+China muestra un crecimiento pronunciado en sus emisiones de CO2 a lo largo del período, especialmente desde principios de los 2000. Este aumento podría estar asociado con el rápido crecimiento económico y la industrialización del país durante estas décadas.
+
+Las emisiones de CO2 de Estados Unidos son relativamente estables durante los 30 años, con un leve descenso después de 2005. Aunque sus emisiones siguen siendo altas en comparación con otros países, se observa una ligera disminución hacia el final del período.
+
+Alemania, Reino Unido, Francia, y Finlandia muestran tendencias de emisiones más estables o ligeramente descendentes. Esto podría ser indicativo de esfuerzos en políticas de reducción de emisiones y la transición hacia fuentes de energía más limpias.
+
+```{r}
+# gráfico de las emisiones de CO2 per capita
+ggplot(df[date>=1990 & date<=2020], 
+       aes(x = date, y= EN.ATM.CO2E.PC, group = factor(country.value), 
+           color = factor(country.value))) +
+  geom_line(size = 1) +
+  labs(title = 'CO2 emissions (metric tons per capita)',
+       x = 'Year',
+       y = 'CO2 Emissions (KT)',
+       color = 'Country') +
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal()  +
+  scale_color_brewer(palette = "Paired")
+
+```
+
+Estados Unidos sigue siendo el mayor emisor per cápita, aunque con una tendencia decreciente, lo que sugiere un impacto de políticas ambientales o una reducción en el consumo de energía basado en combustibles fósiles.
+
+Los países europeos muestran una tendencia clara hacia la reducción de emisiones per cápita, destacándose en el liderazgo en sostenibilidad.
+
+China e India están aumentando sus emisiones per cápita, lo que refleja su crecimiento económico y demográfico, aunque todavía están por debajo de los niveles de los países desarrollados.
+
+## Producto Interno Bruto
+
+Se analiza el nivel de producción para cada uno de los países seleccionados y a nivel mundial.
+
+```{r}
+# Gráfico del GDP
+ggplot(df[date >= 1990 & date <= 2020], 
+       aes(x = date, y = NY.GDP.MKTP.KD / 1e06, 
+           group = factor(country.value), color = factor(country.value))) +
+  geom_line(linewidth = 1) +  # Usar linewidth en lugar de size
+  labs(title = 'GDP over time (constant 2015 millions US$)',
+       x = 'Year',
+       y = 'GDP (Constant 2015 millions US$)',
+       color = 'Country') +  
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+
+```
+
+Se puede observar que Estados unidos tiene un nivel de ingresos muy superior al resto de los países, incluso comparado con el PIB mundial es una parte muy importante.
+
+Es importante destacar que China ha incrementado su nivel de ingreso en los últimos 10 años de manera considerable, casi alcanzando a USA.
+
+Se destava la caída de la producción en 2019 a raíz de la pandemia por COVID que paralizó a gran parte de las economías.
+
+```{r}
+# gráfico del GDP
+ggplot(df[date>=1990 & date<=2020 & country.value!='World'], 
+       aes(x = date, y = NY.GDP.MKTP.KD / 1e06, 
+           group = factor(country.value), color = factor(country.value))) +
+  geom_line(linewidth = 1) +
+  labs(title = 'GDP over time (constant 2015 millions US$)',
+       x = 'Year',
+       y = 'GDP (Constant 2015 millions US$)',
+       color = 'Country') +  
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+```
+
+Estados Unidos se destaca como la economía más grande a lo largo de todo el período, con un PIB que supera los 20 millones de millones de dólares (20 trillones de dólares) hacia el final del período. Su PIB muestra un crecimiento sostenido, aunque parece estabilizarse un poco después de 2015.
+
+China muestra un crecimiento espectacular en su PIB, especialmente a partir de principios de los 2000. Este crecimiento refleja la rápida industrialización y expansión económica que ha experimentado el país, pasando de un PIB comparable al de algunos países europeos en 1990 a convertirse en la segunda economía más grande del mundo, acercándose a los 15 millones de millones de dólares hacia 2020.
+
+## Población
+
+En el análisis de las dinámicas globales, la población de un país es un factor determinante que influye directamente en su desarrollo económico, la demanda de recursos naturales, y su impacto ambiental. A medida que las poblaciones crecen, especialmente en economías emergentes como China e India, los desafíos relacionados con la sostenibilidad, el acceso a recursos, y la infraestructura se vuelven cada vez más críticos. Por otro lado, en naciones desarrolladas como Estados Unidos y los países europeos, las tasas de crecimiento poblacional más moderadas presentan desafíos distintos, como el envejecimiento de la población y la necesidad de mantener un equilibrio entre crecimiento económico y bienestar social. Comprender estas tendencias demográficas es esencial para abordar los problemas globales relacionados con el desarrollo, la economía y el medio ambiente.
+
+La población mundial ha ido incrementándose cada vez más, hasta llegar a los 7.8 mil millones de personas en el planeta.
+
+```{r}
+# gráfico de la población mundial
+ggplot(df[date >= 1990 & date <= 2020 & country.value=='World'], 
+       aes(x = date, y = SP.POP.TOTL/1e06, group = factor(country.value), 
+           color = factor(country.value))) +
+  geom_line(size = 1) +
+  labs(title = 'Total Population Over Time',
+       x = 'Year',
+       y = 'Population',
+       color = 'Country') +
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+
+# países
+ggplot(df[date >= 1990 & date <= 2020 & country.value!='World'], 
+       aes(x = date, y = SP.POP.TOTL/1e06, group = factor(country.value), 
+           color = factor(country.value))) +
+  geom_line(size = 1) +
+  labs(title = 'Total Population Over Time',
+       x = 'Year',
+       y = 'Population',
+       color = 'Country') +
+  scale_x_continuous(breaks = seq(1990, 2020, by = 5)) +
+  theme_minimal()+
+  scale_color_brewer(palette = "Paired")
+```
+
+China e India continúan siendo los países más poblados del mundo, con un crecimiento significativo en sus poblaciones, lo que implica desafíos considerables en términos de recursos, servicios y sostenibilidad. Estados Unidos sigue siendo el país más poblado entre las naciones desarrolladas, con un crecimiento continuo pero más moderado. Europa y Rusia muestran poblaciones relativamente estables, lo que podría reflejar tendencias de envejecimiento y tasas de crecimiento natural más bajas en comparación con los países en desarrollo.
+
+## Emisiones de CO2 y Producción 
+
+En el contexto del desarrollo económico global, la relación entre las emisiones de CO2 y el nivel de ingresos de los países ha sido objeto de un extenso análisis. Un marco conceptual clave para entender esta dinámica es la Curva Ambiental de Kuznets (EKC), la cual sugiere que, en las primeras etapas del crecimiento económico, las emisiones de CO2 tienden a aumentar a medida que las economías dependen más de la industrialización y el uso de energía. Sin embargo, después de alcanzar un cierto umbral de ingreso per cápita, estas emisiones comienzan a disminuir gracias a la adopción de tecnologías más limpias y políticas ambientales más estrictas (Grossman & Krueger, 1995).
+
+```{r}
+# se comparan las series de GDP y CO2 Emissions con los datos mundiales
+
+ggplot(df[date>= 1990 & date <= 2020 & country.value=='World'], 
+       aes(x = date)) +
+  geom_line(aes(y = NY.GDP.MKTP.KD_std, color = "GDP"), size = 1) +
+  geom_line(aes(y = EN.ATM.CO2E.KT_std, color = "CO2 Emissions"), size = 1) +
+  labs(title = 'GDP vs CO2 Emissions (Standardized)',
+       x = 'Year',
+       y = 'Standardized Value',
+       color = 'Variable') +  # Título de la leyenda
+  scale_color_manual(values = c("GDP" = '#1f78b4', 
+                                "CO2 Emissions" = '#b2df8a')) +
+  theme_minimal() 
+```
+
+La gráfica muestra la relación entre el Producto Interno Bruto (GDP) y las emisiones de CO2, ambos estandarizados, desde 1990 hasta 2020. Inicialmente, ambas variables crecen en paralelo, lo que sugiere que el aumento en la actividad económica estuvo asociado con un incremento en las emisiones de CO2, un patrón común en las primeras etapas del desarrollo económico. Sin embargo, a partir de la década de 2010, se observa una divergencia: mientras el GDP sigue aumentando de manera significativa, las emisiones de CO2 comienzan a estabilizarse e incluso muestran una ligera disminución. Este comportamiento es coherente con la hipótesis de la Curva Ambiental de Kuznets, que propone que, después de alcanzar un cierto nivel de ingreso, las economías pueden seguir creciendo sin un incremento proporcional en las emisiones, gracias a la adopción de tecnologías más limpias y políticas ambientales más estrictas. La gráfica, por lo tanto, ilustra cómo un crecimiento económico sostenible es posible sin comprometer el medio ambiente, reflejando un posible desacoplamiento entre el crecimiento del PIB y las emisiones de CO2 en la etapa avanzada del desarrollo.
+
+```{r}
+ggplot(df[date >= 1990 & date <= 2020 & country.value=='World'], 
+       aes(x = date)) +
+  geom_line(aes(y = NY.GDP.PCAP.KD_std, color = "GDP per capita"), size = 1) +
+  geom_line(aes(y = EN.ATM.CO2E.PC_std, color = "CO2 Emissions per capita"), size = 1) +
+  labs(title = 'GDP vs CO2 Emissions (Standardized)',
+       x = 'Year',
+       y = 'Standardized Value',
+       color = 'Variable') +  # Título de la leyenda
+  scale_color_manual(values = c("GDP per capita" = '#1f78b4', 
+                                "CO2 Emissions per capita" = '#b2df8a')) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(df[date >= 1990 & date <= 2020 & country.value=='World'], 
+       aes(x = NY.GDP.PCAP.KD_std, y = EN.ATM.CO2E.PC_std)) +
+  geom_point(color = '#1f78b4', size = 2) +
+  geom_smooth(method = "lm", color = '#fbb4ae', se = T) +
+  labs(title = 'GDP per cápita vs CO2 Emissions per cápita',
+       x = 'GDP per capita',
+       y = 'CO2 per cápita') +
+  theme_minimal()
+```
+
+La gráfica presentada es un gráfico de dispersión que muestra la relación entre el Producto Interno Bruto (GDP) per cápita y las emisiones de CO2 per cápita, ambos valores estandarizados. En la gráfica, cada punto representa un dato de una observación particular (que podría ser un país en un año determinado), y la línea roja representa una línea de regresión lineal que estima la relación entre estas dos variables. El sombreado alrededor de la línea de regresión indica el intervalo de confianza, mostrando la incertidumbre en la estimación.
+
+La gráfica indica que existe una correlación positiva entre el GDP per cápita y las emisiones de CO2 per cápita, lo que sugiere que el crecimiento económico, medido en términos de ingresos per cápita, está asociado con un aumento en las emisiones de CO2 per cápita. Sin embargo, la variabilidad observada sugiere que la relación no es perfectamente lineal, y otros factores podrían estar influyendo en los niveles de emisiones, como la estructura económica, la eficiencia energética, o las políticas ambientales implementadas en cada país.
+
+
+```{r}
+ggplot(df[date >= 1990 & date <= 2020 & country.value=='World'], 
+       aes(x = NY.GDP.PCAP.KD_std, y = EN.ATM.CO2E.PC_std)) +
+  geom_point(color = '#1f78b4', size = 2) +
+  geom_smooth(method = "lm", color = '#fbb4ae', se = T) +
+  labs(title = 'GDP per cápita vs CO2 Emissions per cápita',
+       x = 'GDP per capita',
+       y = 'CO2 per cápita') +
+  theme_minimal()
+```
+
+## Question 2: Predictive Modeling and Scenario Analysis
+
+Para comenzar el análisis se parte de un análisis de correlación entre las varaibles de la base de datos que seleccionamos
+
+```{r}
+library(pacman) ; p_load('tidyverse','data.table', 'ggplot2','WDI', 'httr', 'olsrr',
+                         'jsonlite', 'corrplot', 'pheatmap', 'caret', 'stargazer', 'cv','randomForest',
+                         'rpart','gbm')
+# se retoma la base de correlaciones que se creo en el script "predictive_model"
+load('data/preditvive_model.RData')
+
+# heatmap de la matriz de correlaciones
+pheatmap(cor_matrix, 
+         cluster_rows = FALSE, 
+         cluster_cols = FALSE,  
+         color = colorRampPalette(c('#f03b20', 'white', '#feb24c'))(100),
+         display_numbers = TRUE,  
+         fontsize_number = 5,  
+         main = "Heatmap of the Correlation Matrix")
+
+```
+
+El heatmap muestra la matriz de correlación para un conjunto de indicadores socioeconómicos y ambientales, con correlaciones que varían entre -1 y 1, donde valores cercanos a 1 indican una fuerte correlación positiva, y valores cercanos a -1 indican una fuerte correlación negativa. Se observan varios clusters con correlaciones positivas significativas, especialmente entre indicadores relacionados con el PIB, lo que sugiere que estas variables miden fenómenos interrelacionados o están influenciadas por factores similares. Por otro lado, algunas correlaciones negativas destacan posibles relaciones inversas entre ciertos indicadores, como podría ser el caso entre emisiones de CO2 y algunos indicadores de salud o educación. Las áreas con correlaciones débiles, cercanas a cero, indican que esas variables pueden ser independientes o tener relaciones no lineales que no se capturan con la correlación de Pearson. En general, este análisis resalta la fuerte interconexión entre indicadores económicos y ambientales, sugiriendo que el crecimiento económico suele estar asociado con un aumento en el uso de energía y las emisiones de CO2, mientras que también sugiere áreas donde las relaciones entre variables podrían ser más complejas o indirectas.
+
+```{r}
+# heatmap de la matriz de correlaciones incluyendo clusters de varaible
+pheatmap(cor_matrix, 
+         clustering_distance_rows = "euclidean", 
+         clustering_distance_cols = "euclidean", 
+         clustering_method = "complete",  
+         color = colorRampPalette(c('#f03b20', 'white', '#feb24c'))(100),
+         display_numbers = TRUE,  
+         fontsize_number = 5, 
+         main = "Correlograma con Clustering")
+
+```
+A diferencia del heatmap anterior, aquí se han aplicado algoritmos de clustering para agrupar variables que presentan patrones de correlación similares. Esto se refleja en los dendrogramas que acompañan tanto a las filas como a las columnas, indicando la proximidad y similitud entre las variables. Los clusters formados revelan grupos de variables que están altamente correlacionadas entre sí, lo que sugiere que miden aspectos relacionados o que están influenciadas por los mismos factores subyacentes.
+
+Con base en una selección propia se definieron algunos controles para poder ajustar un modelo de regresión que nos de cuanta las emisiones de CO2.
+
+En primer lugar se realizó un Step wise para verificar las variable y se identificaron las siguientes:
+```{r}
+fm1 <-as.formula(paste("EN.ATM.CO2E.KT ~", paste(controls2, collapse = " + ")))
+model <- lm(fm1, data = data_std, na.action = na.omit)
+ols_step_forward_adj_r2(model, progress = TRUE)
+```
+
+Con base en esto se realizó el primer modelo OLS:
+```{r}
+# primer modelo con variables seleccionadas
+fm1 <-as.formula(paste("EN.ATM.CO2E.KT ~", paste(controls2, collapse = " + ")))
+m1 <- lm(fm1, data = data_std, na.action = na.omit)
+
+# resultados de la regresión
+stargazer(m1,  type = "text", title = "OLS model")
+
+```
+
+Este modelo sugiere que el PIB total, la población total, y el crecimiento de la población urbana son factores clave que impulsan las emisiones de CO2, mientras que el PIB per cápita más alto y un mayor porcentaje de la población en la categoría de ingresos bajos y medios están asociados con una reducción en las emisiones. El alto valor de R² indica que el modelo captura la mayor parte de la variabilidad en las emisiones de CO2, lo que sugiere que estos factores económicos y demográficos son muy relevantes para explicar las emisiones de CO2 en este contexto.
+
+```{r}
+controls3 <- c('NY.GDP.MKTP.KD','SP.POP.TOTL','SI.POV.LMIC','SI.POV.DDAY', 'SP.URB.GROW', 'SI.POV.UMIC', 'SP.RUR.TOTL.ZG','SP.URB.TOTL.IN.ZS')
+fm2 <-as.formula(paste("EN.ATM.CO2E.KT ~", paste(controls3, collapse = " + ")))
+m2 <- lm(fm2, data = data_std, na.action = na.omit)
+
+# resultados de la regresión
+stargazer(m1, m2,  type = "text", title = "OLS model")
+
+```
+
+
+El Modelo 2 parece ser una mejora respecto al Modelo 1 en términos de su simplicidad y la relevancia de las variables incluidas. A pesar de la ligera disminución en el R², el modelo es más robusto al ajustar los coeficientes de las variables clave y eliminar la influencia de posibles relaciones espurias. Los cambios en los coeficientes indican que el modelo ha logrado un mejor control de las relaciones entre las variables, lo que proporciona una interpretación más precisa de los factores que influyen en las emisiones de CO2.
+
+Usando este modelo y proyectando un aumento de 10% en la producción se obtienen los siguientes resultados:
+
+```{r}
+tail(results)
+
+# métricas del modelo
+cat("RMSE: ", rmse, "\n")
+cat("R²: ", r2, "\n")
+
+# visualización de los resultados del modelo
+results_long <- results %>%
+  gather(key = "Type", value = "Emissions", Original_Emissions, New_Emissions)
+
+# gráfica
+ggplot(results_long, aes(x = Country, y = Emissions, fill = Type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Comparison of Original and New CO2 Emissions by Country",
+       x = "Country",
+       y = "CO2 Emissions (KT)",
+       fill = "Emission Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("Original_Emissions" = "#1f77b4", "New_Emissions" = "#ff7f0e"))
+```
+
+Los resultados mostrados corresponden a las emisiones de CO2 originales y las nuevas emisiones proyectadas bajo un escenario en el que el PIB de los países aumenta en un 10%. 
+
+Existen áreas de mejora en este modelo muy sencillo, por lo que se podrían trabajar más en los predicadores.
+
+Además de este modelo lineal se trabajó una selección de modelos no paramétricos para evaluar este modelo, para esto se creo una función con el finde iterar con distintos modelos, los resultados se presentan a continuación:
+ 
+```{r}
+#definimos las variables del modelo
+
+predictors <- controls2
+target_var <- "EN.ATM.CO2E.KT"
+
+# Evaluar los modelos
+model_results <- evaluate_models(data, target_var, predictors)
+print(model_results$Summary)
+```
+
+En este caso El GBM (Gradient Boosting Machine) es claramente el mejor modelo en este caso, dado que tiene tanto el RMSE más bajo como el R² más alto, lo que lo convierte en el modelo más preciso y explicativo de los tres. Este modelo sería tu mejor opción para realizar predicciones sobre las emisiones de CO2.
+
+```{r}
+# Extraer las predicciones de cada modelo
+predictions_df <- data.frame(
+  Actual = model_results$Detailed$RandomForest$Predictions,  # Utilizamos las predicciones de RandomForest como referencia
+  RandomForest = model_results$Detailed$RandomForest$Predictions,
+  DecisionTree = model_results$Detailed$DecisionTree$Predictions,
+  GBM = model_results$Detailed$GBM$New_Predictions
+)
+
+# Crear un dataframe largo para ggplot
+predictions_long <- predictions_df %>%
+  gather(key = "Model", value = "Predicted_Emissions", -Actual)
+
+# Crear la gráfica comparativa
+ggplot(predictions_long, aes(x = Actual, y = Predicted_Emissions, color = Model)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray") +
+  labs(title = "Comparison of Model Predictions vs Actual CO2 Emissions",
+       x = "Actual CO2 Emissions",
+       y = "Predicted CO2 Emissions",
+       color = "Model") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+La gráfica presentada compara las predicciones de emisiones de CO2 realizadas por tres modelos distintos: Decision Tree, GBM (Gradient Boosting Machine), y Random Forest, en relación con las emisiones reales. Los resultados muestran que el GBM es el modelo más preciso, con la mayoría de sus predicciones alineadas cercanamente con la línea de identidad, lo que indica una alta correspondencia entre los valores predichos y los reales. El Random Forest también demuestra un buen rendimiento, aunque con un poco más de dispersión en comparación con el GBM. Por otro lado, el Decision Tree presenta una mayor dispersión en sus predicciones, especialmente para observaciones con emisiones más altas, lo que refleja su menor precisión y capacidad para capturar la relación subyacente entre las variables. En resumen, tanto el GBM como el Random Forest son modelos superiores para predecir las emisiones de CO2, con el GBM destacándose como el más exacto, mientras que el Decision Tree es el menos confiable entre los tres.
+
+
+
+## Question 3: Fermi Problem and Sensitivity Analysis
+
+Para este reactivo se optó por realizar un modelo de simulación de sistemas, retomando algunos supuestos para realizar los escenarios.
+
+En esta simulación, se desarrolló un modelo basado en ecuaciones diferenciales ordinarias (ODEs) para explorar el impacto de la adopción masiva de vehículos eléctricos (EVs) en las emisiones de CO2, tomando en cuenta también el crecimiento poblacional y económico. El modelo incluye tres variables de estado principales: población, Producto Interno Bruto (PIB) y emisiones de CO2. A medida que la población y el PIB crecen con el tiempo, las emisiones de CO2 también tienden a aumentar. Sin embargo, se introdujo una fracción de adopción de EVs que, al alcanzar hasta el 50% de la población, reduce significativamente la intensidad de emisiones por unidad de PIB. Para amplificar el efecto de la adopción de EVs, se ajustaron los parámetros del modelo, aumentando la tasa de adopción de EVs (beta) y el impacto de los EVs en la reducción de emisiones (gamma). Estos ajustes permitieron observar una reducción más marcada en las emisiones de CO2, contrarrestando el efecto del crecimiento económico y demográfico, demostrando así el potencial de los EVs como una herramienta clave en la mitigación del cambio climático.
+ 
+```{r, echo=F}
+rm(list=ls())
+
+load('data/electric_vehicles.RData')
+
+#modelo base
+ggplot(melt(as.data.frame(out), id.vars = "time"), aes(x = time, y = value, color = variable)) +
+  geom_line() +
+  facet_wrap(~variable, scales = "free_y") +
+  labs(title = "Dynamics of Population, GDP, and CO2 Emissions",
+       x = "Time (years)",
+       y = "Values")  +
+  theme_minimal()
+
+```
+En el este modelo, dado que la intensidad de emisiones no cambia, las emisiones de CO2 aumentan a medida que crecen la población y el PIB. Este comportamiento refleja una situación en la que no se implementan tecnologías limpias o políticas ambientales para reducir las emisiones, lo que resulta en un aumento continuo de CO2 a medida que la economía y la población se expanden.
+
+```{r, echo=F}
+#modelo simulando el aumento en las personas que usan veículos electricos 
+ggplot(melt(as.data.frame(out2), id.vars = "time"), aes(x = time, y = value, color = variable)) +
+  geom_line() +
+  facet_wrap(~variable, scales = "free_y") +
+  labs(title = "Dynamics of Population, GDP, and CO2 Emissions",
+       x = "Time (years)",
+       y = "Values")  +
+  theme_minimal()
+
+```
+
+Este segundo modelo es más realista en el contexto de políticas ambientales actuales, donde se busca reducir las emisiones de CO2 a través de la adopción de tecnologías limpias. Permite simular escenarios en los que la introducción de vehículos eléctricos tiene un impacto tangible en la mitigación del cambio climático, demostrando cómo es posible lograr una desaceleración o incluso una reducción en las emisiones globales a pesar del crecimiento económico y poblacional.
+
+Limitaciones y Posibles Mejoras
+
+Aunque este modelo incorpora la adopción de EVs y su impacto en la reducción de emisiones, aún es simplificado y asume un máximo de 50% de adopción de EVs. Para hacerlo más robusto, se podrían incluir otros factores como el cambio en la mezcla energética, políticas gubernamentales, o la adopción de otras tecnologías limpias. Además, se podrían explorar escenarios donde la adopción de EVs supera el 50%, o donde la intensidad de emisiones depende no solo de los EVs, sino también de mejoras en la eficiencia energética.

@@ -1,0 +1,40 @@
+indicator,name
+CC.CO2.EMSE.BF,CO2 emissions by sector (Mt CO2 eq) - Bunker Fuels
+CC.CO2.EMSE.BL,CO2 emissions by sector (Mt CO2 eq) - Building
+CC.CO2.EMSE.EL,CO2 emissions by sector (Mt CO2 eq) - Total excluding LUCF
+CC.CO2.EMSE.EN,CO2 emissions by sector (Mt CO2 eq) - Energy
+CC.CO2.EMSE.FE,CO2 emissions by sector (Mt CO2 eq) - Fugitive Emissions
+CC.CO2.EMSE.IL,CO2 emissions by sector (Mt CO2 eq) - Total including LUCF
+CC.CO2.EMSE.IP,CO2 emissions by sector (Mt CO2 eq) - Industrial Processes
+CC.CO2.EMSE.LU,CO2 emissions by sector (Mt CO2 eq) - Land-Use Change and Forestry
+CC.CO2.EMSE.MC,CO2 emissions by sector (Mt CO2 eq) - Manufacturing/Construction
+CC.CO2.EMSE.TR,CO2 emissions by sector (Mt CO2 eq) - Transportation
+CC.EG.EMIS.MAN,CO2 emissions per dollar of manufacturing value added (kgCO2 per constant 2010 US$)
+CC.EN.ATM.COAL.CE,Lifetime CO2 emissions from coal plants (Mt CO2)
+EN.ATM.CO2E.CP.KT,CO2 emissions from cement production (thousand metric tons)
+EN.ATM.CO2E.FF.KT,"CO2 emissions from fossil-fuels, total (thousand metric tons)"
+EN.ATM.CO2E.FF.ZS,CO2 emissions from fossil-fuels (% of total)
+EN.ATM.CO2E.GDP,"CO2 emissions, industrial (kg per 1987 US$ of GDP)"
+EN.ATM.CO2E.GF.KT,CO2 emissions from gaseous fuel consumption (kt) 
+EN.ATM.CO2E.GF.ZS,CO2 emissions from gaseous fuel consumption (% of total) 
+EN.ATM.CO2E.GL.KT,CO2 emissions from gas flaring (thousand metric tons)
+EN.ATM.CO2E.KD.87.GD,"CO2 emissions, industrial (kg per 1987 US$ of GDP)"
+EN.ATM.CO2E.KD.GD,CO2 emissions (kg per 2015 US$ of GDP)
+EN.ATM.CO2E.KT,CO2 emissions (kt)
+EN.ATM.CO2E.LF.KT,CO2 emissions from liquid fuel consumption (kt) 
+EN.ATM.CO2E.LF.ZS,CO2 emissions from liquid fuel consumption (% of total) 
+EN.ATM.CO2E.PC,CO2 emissions (metric tons per capita)
+EN.ATM.CO2E.PP.GD,CO2 emissions (kg per PPP $ of GDP)
+EN.ATM.CO2E.PP.GD.KD,CO2 emissions (kg per 2017 PPP $ of GDP)
+EN.ATM.CO2E.SF.KT,CO2 emissions from solid fuel consumption (kt) 
+EN.ATM.CO2E.SF.ZS,CO2 emissions from solid fuel consumption (% of total)
+EN.CO2.BLDG.MT,CO2 emissions from residential buildings and commercial and public services (million metric tons)
+EN.CO2.BLDG.ZS,CO2 emissions from residential buildings and commercial and public services (% of total fuel combustion)
+EN.CO2.ETOT.MT,"CO2 emissions from electricity and heat production, total (million metric tons)"
+EN.CO2.ETOT.ZS,"CO2 emissions from electricity and heat production, total (% of total fuel combustion)"
+EN.CO2.MANF.MT,CO2 emissions from manufacturing industries and construction (million metric tons)
+EN.CO2.MANF.ZS,CO2 emissions from manufacturing industries and construction (% of total fuel combustion)
+EN.CO2.OTHX.MT,"CO2 emissions from other sectors, excluding residential buildings and commercial and public services (million metric tons)"
+EN.CO2.OTHX.ZS,"CO2 emissions from other sectors, excluding residential buildings and commercial and public services (% of total fuel combustion)"
+EN.CO2.TRAN.MT,CO2 emissions from transport (million metric tons)
+EN.CO2.TRAN.ZS,CO2 emissions from transport (% of total fuel combustion)
