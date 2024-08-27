@@ -1,10 +1,12 @@
 #SRP
 
-Datosde contacto
-
+Contact information
 Carlos Fabian Fuentes Rivas
 Email: fuentesrivasfabian@gmail.com
 
-Este es el trabajo realizado sobre los puntos requeridos sobre el análisis de datos del World Bank’s Climate Change.
 
-En este repositorio se encuentran dos carpertas, la primera "data" almacena las salidas y bases de datos necesarias para el funcionamiento del restode los archivos. La segunda carpeta "scripts" contiene los scripts que realizan todos los calculos y descargas de datos. Adicionalmente, en esta carpera se encuentra el archivo "Climate_Change_Fabian_Fuentes.Rmd" el cual contiene el análisis propuesto, utilizando el resto de los archivos.
+This is the work done on the required points on the World Bank's Climate Change data analysis.
+
+
+In this repository there are two folders, the first one "data" stores the outputs and databases needed to run the rest of the files. The second folder "scripts" contains the scripts that perform all the calculations and data downloads. Additionally, this folder contains the file "Climate_Change_Fabian_Fuentes.Rmd" which contains the proposed analysis, using the rest of the files.
+
